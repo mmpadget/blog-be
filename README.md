@@ -4,6 +4,8 @@ Blog back-end written with Mongo, Express and Node.
 ## dependencies
 * [body-parser](https://www.npmjs.com/package/body-parser) - Node.js body parsing middleware.
 * [cors](https://www.npmjs.com/package/cors) - Node.js middleware that can be used to enable CORS with various options.
+* [cryptiles](https://www.npmjs.com/package/cryptiles) - General purpose crypto utilities.
+  - [national vulnerability database](https://nvd.nist.gov/vuln/detail/CVE-2018-1000620) - known security vulnerability in version 3.1.2.
 * [ejs](https://www.npmjs.com/package/ejs) - Embedded JavaScript templates.
 * [errorhandler](https://www.npmjs.com/package/errorhandler) - Development-only error handler middleware.
 * [express](https://www.npmjs.com/package/express) - Minimalist web framework for node.
