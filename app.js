@@ -10,6 +10,7 @@ const fs = require('fs'),
   errorhandler = require('errorhandler'),
   mongoose = require('mongoose')
 
+
 const isProduction = process.env.NODE_ENV === 'production'
 
 const app = express()
@@ -34,6 +35,8 @@ if (isProduction) {
   mongoose.connect('mongodb://localhost/blog')
   mongoose.set('debug', true)
 }
+
+require('./models/User')
 
 app.use(require('./routes'))
 
