@@ -13,7 +13,6 @@ passport.use(new LocalStrategy({
     if(!user || !user.validPassword(password)){
       return done(null, false, {errors: {'email or password': 'is valid'}})
     }
-
     return done(null, user)
   }).catch(done)
 }))
