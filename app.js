@@ -1,3 +1,5 @@
+'use strict'
+
 const fs = require('fs'),
   http = require('http'),
   path = require('path'),
@@ -22,9 +24,9 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 app.use(require('method-override')())
-// app.use(express.static(__dirname + /public))
 
 app.use(session({secret: 'blog', cookie: {maxAge: 60000}, resave: false, saveUninitialized: false}))
+
 if (!isProduction) {
   app.use(errorhandler())
 }
@@ -37,6 +39,7 @@ if (isProduction) {
 }
 
 require('./models/User')
+require('./config/passport')
 
 app.use(require('./routes'))
 

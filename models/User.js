@@ -1,3 +1,5 @@
+'use strict'
+
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 const crypto = require('crypto')
@@ -11,7 +13,7 @@ const UserSchema = new mongoose.Schema({
   image: String,
   hash: String,
   salt: String
-}, {timestamp: true})
+}, {timestamps: true})
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'})
 
