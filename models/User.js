@@ -49,4 +49,13 @@ UserSchema.methods.toAuthJSON = function() {
   }
 }
 
+UserSchema.methods.toProfileJSONFor = function(user) {
+  return {
+    username: this.username,
+    bio: this.bio,
+    image: this.image || 'https://api.adorable.io/avatars/144/adorable.png',
+    following: false
+  }
+}
+
 mongoose.model('User', UserSchema)
