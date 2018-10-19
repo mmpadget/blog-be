@@ -5,7 +5,7 @@ const passport = require('passport')
 const mongoose = require('mongoose')
 const Article = mongoose.model('Article')
 const User = mongoose.model('User')
-const auth = require.('../auth')
+const auth = require('../auth')
 
 // Create
 router.post('/', auth.required, function(req, res, next) {

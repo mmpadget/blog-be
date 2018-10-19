@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const secret = require('../config').secret
 
-let UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   username: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/^[a-zA-z0-9]+$/, 'is invalid'], index: true},
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   bio: String,
