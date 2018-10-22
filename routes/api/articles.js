@@ -20,6 +20,32 @@ router.post('/', auth.required, function(req, res, next) {
   }).catch(next)
 })
 
+// An endpoint for favoriting an article
+router.post('/:article/favorite', auth.required, function(req, res, next) {
+  let articleId = req.article._id
+  User.findById(req.payload.id).then(function(user) {
+    if(!user) {return res.sendStatus(401)}
+    return user.favorite(articleId).then(function() {
+      return req.article.updateFavoriteCount().then(function(article) {
+        return res.json({article: article.toJSONFor(user)})
+      })
+    })
+  })
+})
+
+// An endpoint for unfavoriting an article
+router.delete('/:article/favorite', auth.required, function(req, res, next) {
+  let articleId = req.article._id
+  User.findById(req.payload.id).then(function(user) {
+    if(!user) {return res.sendStatus(401)}
+    return user.unfavorite(artileId).then(function() {
+      return req.article.updateFavoriteCount().then(function(article) {
+        return res.json({article: article.toJSONFor(user)})
+      })
+    })
+  }).catch(next)
+})
+
 // Intercept and prepopulate article data from the slug
 router.param('article', function(req, res, next, slug) {
   Article.findOne({slug: slug})

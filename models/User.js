@@ -9,6 +9,7 @@ const secret = require('../config').secret
 const UserSchema = new mongoose.Schema({
   username: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/^[a-zA-z0-9]+$/, 'is invalid'], index: true},
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
+  favorites: [{type: mongoose.Schema.Types.ObjectId, ref: 'Article'}],
   bio: String,
   image: String,
   hash: String,
@@ -56,6 +57,27 @@ UserSchema.methods.toProfileJSONFor = function(user) {
     image: this.image || 'https://api.adorable.io/avatars/144/adorable.png',
     following: false
   }
+}
+
+// A method for a user to favorite an article
+UserSchema.methods.favorite = function(id) {
+  if(this.favorites.indexOf(id) === -1) {
+    this.favorites.push(id)
+  }
+  return this.save()
+}
+
+// A method for a user to unfavorite an article
+UserSchema.methods.unfavorite = function(id) {
+  this.favorites.remove(id)
+  return this.save()
+}
+
+// A method for a user to check if they've favorited an article
+UserSchema.methods.isFavorite = function(id) {
+  return this.favorites.some(function(favoriteId) {
+    return favoriteId.toString() === id.toString()
+  })
 }
 
 mongoose.model('User', UserSchema)
