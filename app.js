@@ -38,8 +38,13 @@ if (isProduction) {
   mongoose.set('debug', true)
 }
 
+// Register our User model with our application
 require('./models/User')
+
+// Register the Article model with our application
 require('./models/Article')
+
+// Register passport with our application
 require('./config/passport')
 
 app.use(require('./routes'))

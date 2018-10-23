@@ -3,6 +3,7 @@
 const jwt = require('express-jwt')
 const secret = require('../config').secret
 
+// Route middleware to handle decoding JWT's
 function getTokenFromHeader(req) {
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token') {
     return req.headers.authorization.split(' ')[1]
@@ -24,4 +25,5 @@ const auth = {
   })
 }
 
+// Export the auth object
 module.exports = auth

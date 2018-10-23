@@ -7,7 +7,7 @@ const Article = mongoose.model('Article')
 const User = mongoose.model('User')
 const auth = require('../auth')
 
-// Create
+// Endpoint for creating articles
 router.post('/', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
     if(!user) {return res.sendStatus(404)}
@@ -20,7 +20,7 @@ router.post('/', auth.required, function(req, res, next) {
   }).catch(next)
 })
 
-// An endpoint for favoriting an article
+// Endpoint for favoriting an article
 router.post('/:article/favorite', auth.required, function(req, res, next) {
   let articleId = req.article._id
   User.findById(req.payload.id).then(function(user) {
@@ -33,7 +33,7 @@ router.post('/:article/favorite', auth.required, function(req, res, next) {
   })
 })
 
-// An endpoint for unfavoriting an article
+// Endpoint for unfavoriting an article
 router.delete('/:article/favorite', auth.required, function(req, res, next) {
   let articleId = req.article._id
   User.findById(req.payload.id).then(function(user) {
@@ -57,7 +57,7 @@ router.param('article', function(req, res, next, slug) {
     }).catch(next)
 })
 
-// Read
+// Read endpoint for retrieving an article by its slug
 router.get('/:article', auth.optional, function(req, res, next) {
   Promise.all([
     req.payload ? User.findById(req.payload.id) : null,
@@ -68,7 +68,7 @@ router.get('/:article', auth.optional, function(req, res, next) {
   }).catch(next)
 })
 
-// Update
+// Endpoint for updating articles
 router.put('/:article', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
     if(req.article.author._id.toString() === req.payload.id.toString()) {
@@ -93,7 +93,7 @@ router.put('/:article', auth.required, function(req, res, next) {
   })
 })
 
-// Delete
+// Endpoint for deleting articles
 router.delete('/:article', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function() {
     if(req.article.author._id.toString() === req.payload.id.toString()) {

@@ -18,10 +18,12 @@ const ArticleSchema = new mongoose.Schema({
 
 ArticleSchema.plugin(uniqueValidator, {message: 'is already taken'})
 
+// A method for generating unique article slugs
 ArticleSchema.methods.slugify = function() {
   this.slug = slugify(this.title) + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36)
 }
 
+// Use Mongoose middleware to invoke the slugify method. Generate the slug before Mongoose tries to validate the model.
 ArticleSchema.pre('validate', function(next) {
   if(!this.slug) {
     this.slugify()
@@ -29,6 +31,7 @@ ArticleSchema.pre('validate', function(next) {
   next()
 })
 
+// Method that returns the JSON of an article
 ArticleSchema.methods.toJSONFor = function(user) {
   return {
     slug: this.slug,

@@ -6,6 +6,7 @@ const passport = require('passport')
 const User = mongoose.model('User')
 const auth = require('../auth')
 
+// User registration route
 router.post('/users', function(req, res, next) {
   let user = new User()
 
@@ -18,8 +19,7 @@ router.post('/users', function(req, res, next) {
   }).catch(next)
 })
 
-// 500 internal server error is the default server response.
-// 422 unprocessable entity if email or password not provided.
+// User login route. 500 internal server error is the default server response. 422 unprocessable entity if email or password not provided.
 router.post('/users/login', function(req, res, next) {
   if(!req.body.user.email) {
     return res.status(422).json({errors: {email: "can't be blank"}})
@@ -40,7 +40,7 @@ router.post('/users/login', function(req, res, next) {
   })(req, res, next)
 })
 
-// 401 unauthorized. If JWT of user removed from the database.
+// Endpoint to get the current user's auth payload from their token. 401 unauthorized. If JWT of user removed from the database.
 router.get('/user', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
     if(!user) {return res.sendStatus(401)}
@@ -48,10 +48,12 @@ router.get('/user', auth.required, function(req, res, next) {
   }).catch(next)
 })
 
+// Update users endpoint
 router.put('/user', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
     if(!user) {return res.sendStatus(401)}
 
+    // Only set fields on the user that were passed by the front-end
     if(typeof req.body.user.username !== 'undefined') {
       user.username = req.body.user.username
     }

@@ -6,6 +6,7 @@ const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const secret = require('../config').secret
 
+// Schema for the user model with validations
 const UserSchema = new mongoose.Schema({
   username: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/^[a-zA-z0-9]+$/, 'is invalid'], index: true},
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
@@ -18,16 +19,20 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'})
 
+// Method for setting User passwords
 UserSchema.methods.setPassword = function(password) {
   this.salt = crypto.randomBytes(16).toString('hex')
+  // Password to hash, the salt, the iteration (number of times to hash the password), the length (how long the hash should be), and the algorithm
   this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex')
 }
 
+// Method to validate passwords
 UserSchema.methods.validPassword = function(password) {
   let hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex')
   return this.hash === hash
 }
 
+// A method on the user model to generate a JWT
 UserSchema.methods.generateJWT = function() {
   let today = new Date()
   let exp = new Date(today)
@@ -40,6 +45,7 @@ UserSchema.methods.generateJWT = function() {
   }, secret)
 }
 
+// A method to get the JSON representation of a user for authentication
 UserSchema.methods.toAuthJSON = function() {
   return {
     username: this.username,
@@ -50,6 +56,7 @@ UserSchema.methods.toAuthJSON = function() {
   }
 }
 
+// A method that returns a user's public profile data with a user object parameter
 UserSchema.methods.toProfileJSONFor = function(user) {
   return {
     username: this.username,
