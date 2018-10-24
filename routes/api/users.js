@@ -22,10 +22,12 @@ router.post('/users', function(req, res, next) {
 // User login route. 500 internal server error is the default server response. 422 unprocessable entity if email or password not provided.
 router.post('/users/login', function(req, res, next) {
   if(!req.body.user.email) {
+    // Unprocessable entity
     return res.status(422).json({errors: {email: "can't be blank"}})
   }
 
   if(!req.body.user.password) {
+    // Unprocessable entity
     return res.status(422).json({errors: {password: "can't be blank"}})
   }
 
@@ -35,6 +37,7 @@ router.post('/users/login', function(req, res, next) {
       user.token = user.generateJWT()
       return res.json({user: user.toAuthJSON()})
     } else {
+      // Unprocessable entity
       return res.status(422).json(info)
     }
   })(req, res, next)
@@ -43,7 +46,7 @@ router.post('/users/login', function(req, res, next) {
 // Endpoint to get the current user's auth payload from their token. 401 unauthorized. If JWT of user removed from the database.
 router.get('/user', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
-    if(!user) {return res.sendStatus(401)}
+    if(!user) {return res.sendStatus(401)} // Unauthorized
     return res.json({user: user.toAuthJSON()})
   }).catch(next)
 })
@@ -51,7 +54,7 @@ router.get('/user', auth.required, function(req, res, next) {
 // Update users endpoint
 router.put('/user', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
-    if(!user) {return res.sendStatus(401)}
+    if(!user) {return res.sendStatus(401)} // Unauthorized
 
     // Only set fields on the user that were passed by the front-end
     if(typeof req.body.user.username !== 'undefined') {

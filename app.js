@@ -44,6 +44,9 @@ require('./models/User')
 // Register the Article model with our application
 require('./models/Article')
 
+// Register the comments model with our application
+require('./models/Comment')
+
 // Register passport with our application
 require('./config/passport')
 

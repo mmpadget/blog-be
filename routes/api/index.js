@@ -14,6 +14,7 @@ router.use('/articles', require('./articles'))
 // Function for our API router to handle validation errors from Mongoose
 router.use(function(err, req, res, next) {
   if(err.name === 'ValidationError') {
+    // Unprocessable entity
     return res.status(422).json({
       errors: Object.keys(err.errors).reduce(function(errors, key) {
         errors[key] = err.errors[key].message
