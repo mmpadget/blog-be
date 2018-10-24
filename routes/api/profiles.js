@@ -8,7 +8,8 @@ const auth = require('../auth')
 // Prepopulate req.profile with the user's data when the :username parameter is contained within a route
 router.param('username', function(req, res, next, username) {
   User.findOne({username: username}).then(function(user) {
-    if(!user) {return res.sendStatus(404)} // Not found
+    // Not found
+    if(!user) {return res.sendStatus(404)}
     req.profile = user
     return next()
   }).catch(next)

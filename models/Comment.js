@@ -1,8 +1,8 @@
 'use strict'
 
-let mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-let CommentSchema = new mongoose.Schema({
+const CommentSchema = new mongoose.Schema({
   body: String,
   author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
   article: {type: mongoose.Schema.Types.ObjectId, ref: 'Article'}

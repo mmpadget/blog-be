@@ -46,7 +46,8 @@ router.post('/users/login', function(req, res, next) {
 // Endpoint to get the current user's auth payload from their token. 401 unauthorized. If JWT of user removed from the database.
 router.get('/user', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
-    if(!user) {return res.sendStatus(401)} // Unauthorized
+    // Unauthorized
+    if(!user) {return res.sendStatus(401)}
     return res.json({user: user.toAuthJSON()})
   }).catch(next)
 })
@@ -54,7 +55,8 @@ router.get('/user', auth.required, function(req, res, next) {
 // Update users endpoint
 router.put('/user', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
-    if(!user) {return res.sendStatus(401)} // Unauthorized
+    // Unauthorized
+    if(!user) {return res.sendStatus(401)}
 
     // Only set fields on the user that were passed by the front-end
     if(typeof req.body.user.username !== 'undefined') {
