@@ -11,6 +11,9 @@ router.use('/profiles', require('./profiles'))
 // Register the articles router with the API router
 router.use('/articles', require('./articles'))
 
+// Register the tags router with the API router
+router.use('/tags', require('./tags'))
+
 // Function for our API router to handle validation errors from Mongoose
 router.use(function(err, req, res, next) {
   if(err.name === 'ValidationError') {
