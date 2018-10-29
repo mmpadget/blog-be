@@ -11,6 +11,7 @@ const UserSchema = new mongoose.Schema({
   username: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/^[a-zA-z0-9]+$/, 'is invalid'], index: true},
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   favorites: [{type: mongoose.Schema.Types.ObjectId, ref: 'Article'}],
+  following: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
   bio: String,
   image: String,
   hash: String,
@@ -19,14 +20,14 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'})
 
-// Method for setting User passwords
+// A method for setting User passwords
 UserSchema.methods.setPassword = function(password) {
   this.salt = crypto.randomBytes(16).toString('hex')
   // Password to hash, the salt, the iteration (number of times to hash the password), the length (how long the hash should be), and the algorithm
   this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex')
 }
 
-// Method to validate passwords
+// A method to validate passwords
 UserSchema.methods.validPassword = function(password) {
   let hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex')
   return this.hash === hash
@@ -62,7 +63,7 @@ UserSchema.methods.toProfileJSONFor = function(user) {
     username: this.username,
     bio: this.bio,
     image: this.image || 'https://api.adorable.io/avatars/144/adorable.png',
-    following: false
+    following: user ? user.isFollowing(this._id) : false
   }
 }
 
@@ -84,6 +85,27 @@ UserSchema.methods.unfavorite = function(id) {
 UserSchema.methods.isFavorite = function(id) {
   return this.favorites.some(function(favoriteId) {
     return favoriteId.toString() === id.toString()
+  })
+}
+
+// A method for a following another user
+UserSchema.methods.follow = function(id) {
+  if(this.following.indexOf(id) === -1) {
+    this.following.push(id)
+  }
+  return this.save()
+}
+
+// A method for unfollowing another user
+UserSchema.methods.unfollow = function(id) {
+  this.following.remove(id)
+  return this.save()
+}
+
+// A method for checking if a user is following another user
+UserSchema.methods.isFollowing = function(id) {
+  return this.following.some(function(followId) {
+    return followId.toString() === id.toString()
   })
 }
 

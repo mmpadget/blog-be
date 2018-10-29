@@ -11,9 +11,10 @@ const auth = require('../auth')
 // Endpoint for creating articles
 router.post('/', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
-    // Not found
-    if(!user) {return res.sendStatus(404)}
+    if(!user) {return res.sendStatus(404)} // Not found
+
     let article = new Article(req.body.article)
+
     article.author = user
     return article.save().then(function() {
       console.log(article.author)
@@ -25,9 +26,10 @@ router.post('/', auth.required, function(req, res, next) {
 // Endpoint for favoriting an article
 router.post('/:article/favorite', auth.required, function(req, res, next) {
   let articleId = req.article._id
+
   User.findById(req.payload.id).then(function(user) {
-    // Unauthorized
-    if(!user) {return res.sendStatus(401)}
+    if(!user) {return res.sendStatus(401)} // Unauthorized
+
     return user.favorite(articleId).then(function() {
       return req.article.updateFavoriteCount().then(function(article) {
         return res.json({article: article.toJSONFor(user)})
@@ -39,9 +41,9 @@ router.post('/:article/favorite', auth.required, function(req, res, next) {
 // Endpoint for unfavoriting an article
 router.delete('/:article/favorite', auth.required, function(req, res, next) {
   let articleId = req.article._id
+
   User.findById(req.payload.id).then(function(user) {
-    // Unauthorized
-    if(!user) {return res.sendStatus(401)}
+    if(!user) {return res.sendStatus(401)} // Unauthorized
     return user.unfavorite(articleId).then(function() {
       return req.article.updateFavoriteCount().then(function(article) {
         return res.json({article: article.toJSONFor(user)})
@@ -55,8 +57,7 @@ router.param('article', function(req, res, next, slug) {
   Article.findOne({slug: slug})
     .populate('author')
     .then(function(article) {
-      // Not found
-      if(!article) {return res.sendStatus(404)}
+      if(!article) {return res.sendStatus(404)} // Not found
       req.article = article
       return next()
     }).catch(next)
@@ -93,8 +94,7 @@ router.put('/:article', auth.required, function(req, res, next) {
         return res.json({article: article.toJSONFor(user)})
       }).catch(next)
     } else {
-      // Forbidden
-      return res.sendStatus(403)
+      return res.sendStatus(403) // Forbidden
     }
   })
 })
@@ -104,12 +104,10 @@ router.delete('/:article', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function() {
     if(req.article.author._id.toString() === req.payload.id.toString()) {
       return req.article.remove().then(function() {
-        // No content
-        return res.sendStatus(204)
+        return res.sendStatus(204) // No content
       })
     } else {
-      // Forbidden
-      return res.sendStatus(403)
+      return res.sendStatus(403) // Forbidden
     }
   })
 })
@@ -117,8 +115,7 @@ router.delete('/:article', auth.required, function(req, res, next) {
 // Endpoint to create comments on articles
 router.post('/:article/comments', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user) {
-    // Unauthorized
-    if(!user) {return res.sendStatus(401)}
+    if(!user) {return res.sendStatus(401)} // Unauthorized
 
     var comment = new Comment(req.body.comment)
     comment.article = req.article
@@ -156,8 +153,8 @@ router.get('/:article/comments', auth.optional, function(req, res, next) {
 // Middleware for resolving the /:comment in our URL
 router.param('comment', function(req, res, next, id) {
   Comment.findById(id).then(function(comment) {
-    // Not found
-    if(!comment) {return res.sendStatus(404)}
+    if(!comment) {return res.sendStatus(404)} // Not found
+
     req.comment = comment
     return next()
   }).catch(next)
@@ -170,12 +167,10 @@ router.delete('/:article/comments/:comment', auth.required, function(req, res, n
     req.article.save()
       .then(Comment.find({_id: req.comment._id}).remove().exec())
       .then(function() {
-        // No content
-        res.sendStatus(204)
+        res.sendStatus(204) // No content
       })
   } else {
-    // Forbidden
-    res.sendStatus(403)
+    res.sendStatus(403) // Forbidden
   }
 })
 

@@ -1,2 +1,2 @@
 # blog-be
-Blog back-end written with Mongo, Express and Node.
+Blog back end written with MongoDB, Express.js and Node.js
