@@ -22,31 +22,88 @@ router.get('/', auth.optional, function(req, res, next) {
    offset = req.query.offset
  }
 
+// Filter articles by tags
  if(typeof req.query.tag !== 'undefined') {
    query.tagList = {"$in" : [req.query.tag]}
  }
 
- return Promise.all([
-   Article.find(query)
-    .limit(Number(limit))
-    .skip(Number(offset))
-    .sort({createdAt: 'desc'})
-    .populate('author')
-    .exec(),
-  Article.count(query).exec(),
-  req.payload ? User.findById(req.payload.id) : null,
+// Filter articles by author and favoriter
+Promise.all([
+  req.query.author ? User.findOne({username: req.query.author}) : null,
+  req.query.favorited ? User.findOne({username: req.query.favorited}) : null
 ]).then(function(results) {
-    let articles = results[0]
-    let articlesCount = results[1]
-    let user = results[2]
+    let author = results[0]
+    let favoriter = results[1]
 
-    return res.json({
-      articles: articles.map(function(article) {
-        return article.toJSONFor(user)
-      }),
-      articlesCount: articlesCount
+    if(author) {
+      query.author = author._id
+    }
+
+    if(favoriter) {
+      query._id = {$in: favoriter.favorites}
+    } else if(req.query.favorited) {
+      query._id = {$in: []}
+    }
+
+    return Promise.all([
+      Article.find(query)
+      .limit(Number(limit))
+      .skip(Number(offset))
+      .sort({createdAt: 'desc'})
+      .populate('author')
+      .exec(),
+      Article.count(query).exec(),
+      req.payload ? User.findById(req.payload.id) : null,
+    ]).then(function(results) {
+      let articles = results[0]
+      let articlesCount = results[1]
+      let user = results[2]
+
+      return res.json({
+        articles: articles.map(function(article) {
+          return article.toJSONFor(user)
+        }),
+        articlesCount: articlesCount
+      })
     })
   }).catch(next)
+})
+
+// Articles based on who the user is following
+router.get('/feed', auth.required, function(req, res, next) {
+  let limit = 20
+  let offset = 0
+
+  if(typeof req.query.limit !== 'undefined') {
+    limit = req.query.limit
+  }
+
+  if(typeof req.query.offset !== 'undefined') {
+    offset = req.query.offset
+  }
+
+  User.findById(req.payload.id).then(function(user) {
+    if(!user) {return res.sendStatus(401)}  // Unauthorized
+
+    Promise.all([
+      Article.find({author: {$in: user.following}})
+        .limit(Number(limit))
+        .skip(Number(offset))
+        .populate('author')
+        .exec(),
+      Article.count({author: {$in: user.following}})
+    ]).then(function(results) {
+      let articles = results[0]
+      let articlesCount = results[1]
+
+      return res.json({
+        articles: articles.map(function(article) {
+          return article.toJSONFor(user)
+        }),
+        articlesCount: articlesCount
+      })
+    }).catch(next)
+  })
 })
 
 // Endpoint for creating articles
