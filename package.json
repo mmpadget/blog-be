@@ -41,6 +41,6 @@
   },
   "homepage": "https://github.com/mmpadget/blog-be#readme",
   "devDependencies": {
-    "newman": "^4.1.0"
+    "newman": "^4.2.2"
   }
 }
